@@ -72,18 +72,15 @@ class _ResetPassworViewState extends State<ResetPasswordView> {
               ),
               const Expanded(child: SizedBox()),
               customBotton(
-                
                 onPressed: () async {
                   var isValidate = formKey.currentState!.validate();
                   if (isValidate) {
-                    var isSent = await context
-                        .read<AuthCubit>()
-                        .sendCodeToEmail(email: _emailController.text);
-                        
-                        if(isSent){
-                          Navigator.pushNamed(context, verifyCodeView,
+                    context.read<AuthCubit>().changeUser(
+                          user:
+                              state.user.copyWith(email: _emailController.text),
+                        );
+                    Navigator.pushNamed(context, verifyCodeView,
                         arguments: createNewPasswordView);
-                        }
                   }
                 },
                 title: state.formzStatus.isSubmissionInProgress ? null : 'SEND',

@@ -14,21 +14,7 @@ class ApiProvider {
   });
 
   // =========================== Auth ===========================
-  Future<void> authorize() async {
-    Response response = await apiClient.dio.get(apiClient.dio.options.baseUrl,
-        options: Options(headers: {
-          "Authorization":
-              'Bearer ${StorageService.instance.storage.read('token')}'
-        }));
-    debugPrint("------------ AUTHORIZE ${response.data}------");
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      debugPrint('------ AUTHORIZATION BEARED ------');
-    } else {
-      throw Exception();
-    }
-  }
-
-  Future<bool> registerUser({required UserModel user}) async {
+  Future<void> registerUser({required UserModel user}) async {
     try {
       Response response = await apiClient.dio.post(
         "${apiClient.dio.options.baseUrl}/api/accounts/registr",
@@ -40,14 +26,17 @@ class ApiProvider {
           'password': user.password
         },
       );
-      debugPrint('RESPONSE DATA: ${response.data}');
-      if (response.data['message'] == 'true') {
-        return true;
-      } else {
-        return false;
+
+      debugPrint('=== DIO REGISTER ===\ndata: ${response.data}');
+      debugPrint('${response.statusCode}');
+    } on DioError catch (e) {
+      debugPrint("*** DIO REGISTER ERROR ***\n ${e.response?.data}");
+      if (e.response?.data is Map<String, dynamic>) {
+        if ((e.response?.data as Map<String, dynamic>).containsKey('message')) {
+          throw e.response?.data['message'];
+        }
       }
-    } catch (e) {
-      throw e;
+      throw 'some error try again please';
     }
   }
 
@@ -58,9 +47,13 @@ class ApiProvider {
         "${apiClient.dio.options.baseUrl}/api/accounts/login",
         data: {'email': email, 'password': password},
       );
+
+      debugPrint('=== DIO LOGIN ===');
+      debugPrint('${response.statusCode}');
+
       return response.data;
     } on DioError catch (e) {
-      debugPrint("DIO ERROR FROM API: ${e.response?.data}");
+      debugPrint("*** DIO LOGIN ERROR ***\n ${e.response?.data}");
       if (e.response?.data is Map<String, dynamic>) {
         if ((e.response?.data as Map<String, dynamic>).containsKey('message')) {
           throw e.response?.data['message'];
@@ -70,16 +63,24 @@ class ApiProvider {
     }
   }
 
-  Future<bool> verifyEmail({required String email, required int code}) async {
-    Response response = await apiClient.dio.post(
-      "${apiClient.dio.options.baseUrl}/api/accounts/verify-email",
-      data: {'email': email, 'code': code},
-    );
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      debugPrint("CODE VERIFED");
-      return true;
-    } else {
-      throw Exception();
+  Future<void> verifyEmail({required String email, required int code}) async {
+    try {
+      Response response = await apiClient.dio.post(
+        "${apiClient.dio.options.baseUrl}/api/accounts/verify-email",
+        data: {'email': email, 'code': code},
+      );
+
+      debugPrint('=== DIO VERIFY ===');
+      debugPrint('${response.statusCode}');
+      
+    } on DioError catch (e) {
+      debugPrint("*** DIO VERIFY ERROR ***\n ${e.response?.data}");
+      if (e.response?.data is Map<String, dynamic>) {
+        if ((e.response?.data as Map<String, dynamic>).containsKey('message')) {
+          throw e.response?.data['message'];
+        }
+      }
+      rethrow;
     }
   }
 

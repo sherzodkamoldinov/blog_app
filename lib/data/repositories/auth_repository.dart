@@ -7,9 +7,7 @@ class AuthRepository {
 
   final ApiProvider _apiProvider;
 
-  Future<void> authorize() => _apiProvider.authorize();
-
-  Future<bool> registerUser({required UserModel user}) =>
+  Future<void> registerUser({required UserModel user}) =>
       _apiProvider.registerUser(user: user);
 
   Future<Map<String, dynamic>> login(

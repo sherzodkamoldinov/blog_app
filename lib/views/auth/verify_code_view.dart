@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,7 +7,6 @@ import 'package:formz/formz.dart';
 import 'package:pinput/pinput.dart';
 import 'package:vlog_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:vlog_app/utils/color.dart';
-import 'package:vlog_app/utils/constants.dart';
 import 'package:vlog_app/utils/my_utils.dart';
 import 'package:vlog_app/utils/style.dart';
 import 'package:vlog_app/views/widgest/custom_appbar.dart';
@@ -23,11 +24,17 @@ class VerifyCodeView extends StatefulWidget {
 class _VerifyViewState extends State<VerifyCodeView> {
   late TextEditingController _pinPutController;
   late FocusNode _pinPutFocusNode;
-  bool showError = false;
+
+  Timer? countdownTimer;
+  Duration myDuration = const Duration(minutes: 4);
 
   _init() async {
-    await BlocProvider.of<AuthCubit>(context).sendCodeToEmail(
-        email: BlocProvider.of<AuthCubit>(context).state.user.email);
+    await context.read<AuthCubit>().sendCodeToEmail(
+          email: context.read<AuthCubit>().state.user.email,
+        );
+    context.read<AuthCubit>().state.formzStatus.isSubmissionSuccess
+        ? startTimer()
+        : null;
   }
 
   @override
@@ -47,6 +54,9 @@ class _VerifyViewState extends State<VerifyCodeView> {
 
   @override
   Widget build(BuildContext context) {
+    String strDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = strDigits(myDuration.inMinutes.remainder(60));
+    final seconds = strDigits(myDuration.inSeconds.remainder(60));
     final defaultPinTheme = PinTheme(
       width: 56,
       height: 60,
@@ -64,15 +74,15 @@ class _VerifyViewState extends State<VerifyCodeView> {
     const errorColor = Color.fromRGBO(255, 234, 238, 1);
     const fillColor = Color.fromRGBO(222, 231, 240, .57);
 
-    return BlocListener<AuthCubit, AuthState>(
+    return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.formzStatus == FormzStatus.submissionFailure) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(state.errorText)));
+          MyUtils.showSnackBar(context, state.errorText);
         }
       },
-      child: Scaffold(
+      builder: (context, state) {
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: MyColors.backgroundColor,
           appBar: const CustomAppBar(title: "Verify Register"),
           body: Padding(
@@ -84,8 +94,8 @@ class _VerifyViewState extends State<VerifyCodeView> {
                 Text("Enter verification code",
                     style: MyTextStyle.sfProRegular.copyWith(fontSize: 32.sp)),
                 Text(
-                  "Please enter the verication code sent to email ${context.read<AuthCubit>().state.user.email}",
-                  style: MyTextStyle.sfProRegular.copyWith(fontSize: 18.sp),
+                  "Please enter the verication code sent to email ${state.user.email}",
+                  style: MyTextStyle.sfProRegular.copyWith(fontSize: 20.sp),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 35.h),
@@ -96,9 +106,7 @@ class _VerifyViewState extends State<VerifyCodeView> {
                   controller: _pinPutController,
                   focusNode: _pinPutFocusNode,
                   defaultPinTheme: defaultPinTheme,
-                  onCompleted: (pin) {
-                    setState(() => showError = pin != '5555');
-                  },
+                  onCompleted: (pin) {},
                   focusedPinTheme: defaultPinTheme.copyWith(
                     height: 68,
                     width: 64,
@@ -113,64 +121,112 @@ class _VerifyViewState extends State<VerifyCodeView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 25.h),
+                SizedBox(height: 45.h),
+
+                // TIMER
+                Visibility(
+                  visible: !state.formzStatus.isSubmissionInProgress,
+                  child: Text(
+                    '$minutes : $seconds',
+                    style: MyTextStyle.sfProMedium.copyWith(
+                        fontSize: 45.sp, color: MyColors.ntGradient[0]),
+                  ),
+                ),
+
+                const Expanded(flex: 1, child: SizedBox()),
 
                 // RESEND CODE BUTTON
                 InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    _pinPutController.clear();
+                    resetTimer();
+                    await context.read<AuthCubit>().sendCodeToEmail(
+                          email: state.user.email,
+                        );
+                    state.formzStatus.isSubmissionSuccess ? startTimer() : null;
+                  },
                   child: RichText(
                     text: TextSpan(children: [
                       TextSpan(
                           text: "Didn't get the code? ",
                           style: MyTextStyle.sfProRegular
-                              .copyWith(fontSize: 20.sp)),
+                              .copyWith(fontSize: 23.sp)),
                       TextSpan(
                           text: "Resend",
                           style: MyTextStyle.sfProSemibold
-                              .copyWith(fontSize: 20.sp)),
+                              .copyWith(fontSize: 23.sp)),
                     ]),
                   ),
                 ),
-                SizedBox(height: 15.h),
+                SizedBox(height: 30.h),
 
                 // TRY ANTORHER EMAIL
                 InkWell(
                   onTap: () {
                     Navigator.pop(context);
                   },
-                  child: Text("Or Try Another Email Address",
-                      style: MyTextStyle.sfProSemibold
-                          .copyWith(fontSize: 20.sp, color: MyColors.ntColor)),
+                  child: Text(
+                    "Or Try Another Email Address",
+                    style: MyTextStyle.sfProSemibold
+                        .copyWith(fontSize: 20.sp, color: MyColors.ntColor),
+                  ),
                 ),
-                const Expanded(child: SizedBox()),
 
-                // TODO:TEST
-                Text("$showError and ${_pinPutController.text}"),
-                const Expanded(child: SizedBox()),
+                const Expanded(flex: 4, child: SizedBox()),
 
                 // SEND CODE BUTTON
                 customBotton(
-                    onPressed: () async {
-                      if (_pinPutController.text.length == 4) {
-                        try{
-                          await context.read<AuthCubit>().verifyEmail(
-                              code: int.parse(_pinPutController.text),
-                            );
-                        debugPrint(context.read<AuthCubit>().state.formzStatus.toString());
-                        Navigator.pushReplacementNamed(context, widget.navigateView);
-                        }catch (e){
-                          MyUtils.showSnackBar(context, "Wrong code");
-                        }
-                      } else {
-                        MyUtils.showSnackBar(context, "Please enter code!");
-                      }
-                    },
-                    title: "NEXT",
-                    fillColor: true),
+                  onPressed: () async {
+                    if (_pinPutController.text.length == 4) {
+                      await context.read<AuthCubit>().verifyEmail(
+                            code: int.parse(_pinPutController.text),
+                          );
+                      Navigator.pushReplacementNamed(
+                        context,
+                        widget.navigateView,
+                      );
+                    } else {
+                      MyUtils.showSnackBar(context, "Please enter code!");
+                    }
+                  },
+                  title:
+                      state.formzStatus.isSubmissionInProgress ? null : "NEXT",
+                  fillColor: true,
+                ),
                 SizedBox(height: 20.h),
               ],
             ),
-          )),
+          ),
+        );
+      },
+    );
+  }
+
+  void startTimer() {
+    countdownTimer =
+        Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+  }
+
+  void stopTimer() {
+    setState(() => countdownTimer!.cancel());
+  }
+
+  void resetTimer() {
+    stopTimer();
+    setState(() => myDuration = const Duration(minutes: 4));
+  }
+
+  void setCountDown() {
+    const reduceSecondsBy = 1;
+    setState(
+      () {
+        final seconds = myDuration.inSeconds - reduceSecondsBy;
+        if (seconds < 0) {
+          countdownTimer!.cancel();
+        } else {
+          myDuration = Duration(seconds: seconds);
+        }
+      },
     );
   }
 }

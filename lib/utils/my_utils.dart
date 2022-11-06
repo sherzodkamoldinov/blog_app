@@ -1,3 +1,4 @@
+import 'package:formz/formz.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/style.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,8 @@ class MyUtils {
             const SizedBox(width: 10),
             Text(
               text,
-              style: MyTextStyle.sfProRegular.copyWith(fontSize: 18, color: MyColors.white),
+              style: MyTextStyle.sfProRegular
+                  .copyWith(fontSize: 18, color: MyColors.white),
             ),
           ]),
           shape: RoundedRectangleBorder(
@@ -49,12 +51,18 @@ class MyUtils {
 
   static showLoader(BuildContext context) {
     showDialog(
-        context: context,
-        builder: (_) {
-          return const Center(
+      context: context,
+      builder: (_) {
+        return Container(
+          height: 100,
+          width: 100,
+          color: MyColors.white.withOpacity(0.6),
+          child: const Center(
             child: CircularProgressIndicator(),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   static void fieldFocusChange(

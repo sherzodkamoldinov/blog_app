@@ -7,6 +7,7 @@ import 'package:vlog_app/utils/style.dart';
 class CustomTextField extends StatefulWidget {
   const CustomTextField({
     super.key,
+    TextEditingController? confirm,
     required TextEditingController controller,
     required bool isPassword,
     required String text,
@@ -16,15 +17,17 @@ class CustomTextField extends StatefulWidget {
     required this.type,
   })  : _controller = controller,
         _isPassword = isPassword,
-        _text = text, // text, password, email
+        _text = text, // text, password, email, confirm
         _focusNode = focusNode,
-        _nextFocusNode = nextFocusNode;
+        _nextFocusNode = nextFocusNode,
+        _confirm = confirm;
 
   final TextEditingController _controller;
+  final TextEditingController? _confirm;
   final bool _isPassword;
   final String _text;
   final FocusNode _focusNode;
-  final FocusNode _nextFocusNode;
+  final FocusNode _nextFocusNode; // dont use becouse its textFormField
   final bool isEnd;
   final String type;
 
@@ -38,7 +41,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      keyboardType: widget.type == 'email' ? TextInputType.emailAddress : TextInputType.text,
+      keyboardType: widget.type == 'email'
+          ? TextInputType.emailAddress
+          : TextInputType.text,
       cursorColor: MyColors.richBlack,
       validator: (value) {
         switch (widget.type) {
@@ -50,6 +55,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
           case 'password':
             if (value != null && value.length < 8) {
               return "Length should be large than 7";
+            }
+            return null;
+          case 'confirm':
+            if (value != null &&
+                widget._controller.text != widget._confirm!.text) {
+              return 'Both password must match';
             }
             return null;
           case 'text':
@@ -103,7 +114,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: MyColors.red),
         ),
-        
       ),
     );
   }

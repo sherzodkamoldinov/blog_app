@@ -51,82 +51,92 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
       resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.backgroundColor,
       appBar: const CustomAppBar(title: 'Create New Password'),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Form(
-          key: formKey,
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            SizedBox(height: 30.h),
+      body: BlocConsumer<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state.formzStatus.isSubmissionFailure) {
+            MyUtils.showSnackBar(context, state.errorText);
+          }
+        },
+        builder: (context, state) {
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Form(
+              autovalidateMode: AutovalidateMode.always,
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
-            // TITLE
-            Text(
-              "Your new Password must be different from previous used passwords.",
-              style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp),
-            ),
-            SizedBox(height: 30.h),
+                  SizedBox(height: 30.h),
 
-            // FIELDS
-            Text(
-              "  Password",
-              style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp),
-            ),
-            SizedBox(height: 7.h),
-            CustomTextField(
-              controller: _passwordController,
-              isPassword: true,
-              text: 'Enter new Password',
-              focusNode: _passwordFocusNode,
-              nextFocusNode: _confirmPasswordFocusNode,
-              type: 'password',
-            ),
-            SizedBox(height: 30.h),
+                  // TITLE
+                  Text(
+                    "Your new Password must be different from previous used passwords.",
+                    style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp),
+                  ),
+                  SizedBox(height: 30.h),
 
-            Text(
-              "  Confirm Password",
-              style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp),
-            ),
-            SizedBox(height: 7.h),
-            CustomTextField(
-              isEnd: true,
-              controller: _confirmPasswordController,
-              isPassword: true,
-              text: 'Enter confirm Password',
-              focusNode: _confirmPasswordFocusNode,
-              nextFocusNode: _confirmPasswordFocusNode,
-              type: 'password',
-            ),
-            const Expanded(child: SizedBox()),
+                  // FIELDS
+                  // PASSWORD FIELD
+                  Text(
+                    "  Password",
+                    style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp),
+                  ),
+                  SizedBox(height: 7.h),
+                  CustomTextField(
+                    controller: _passwordController,
+                    isPassword: true,
+                    text: 'Enter new Password',
+                    focusNode: _passwordFocusNode,
+                    nextFocusNode: _confirmPasswordFocusNode,
+                    type: 'password',
+                  ),
+                  SizedBox(height: 30.h),
 
-            // SEND NEW PASSWORD
-            BlocBuilder<AuthCubit, AuthState>(
-              builder: (context, state) {
-                return customBotton(
-                  onPressed: () async {
-                    var isValid = formKey.currentState!.validate();
-                    if (isValid &&
-                        _passwordController.text ==
-                            _confirmPasswordController.text) {
-                      await context
-                          .read<AuthCubit>()
-                          .resetPassword(password: _passwordController.text);
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, loginView, (route) => false);
-                    } else {
-                      MyUtils.showSnackBar(
-                          context, 'Both password must match!');
-                    }
-                  },
-                  title: state.formzStatus.isSubmissionInProgress
-                      ? null
-                      : "Reset Password",
-                  fillColor: true,
-                );
-              },
+                  // CONFIRM FIELD
+                  Text(
+                    "  Confirm Password",
+                    style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp),
+                  ),
+                  SizedBox(height: 7.h),
+                  CustomTextField(
+                    isEnd: true,
+                    confirm: _passwordController,
+                    controller: _confirmPasswordController,
+                    isPassword: true,
+                    text: 'Enter confirm Password',
+                    focusNode: _confirmPasswordFocusNode,
+                    nextFocusNode: _confirmPasswordFocusNode,
+                    type: 'confirm',
+                  ),
+                  const Expanded(child: SizedBox()),
+
+                  // SEND NEW PASSWORD
+                  customBotton(
+                    onPressed: () async {
+                      var isValid = formKey.currentState!.validate();
+                      if (isValid) {
+                        await context
+                            .read<AuthCubit>()
+                            .resetPassword(password: _passwordController.text);
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, loginView, (route) => false);
+                      } else {
+                        MyUtils.showSnackBar(context, 'Fill currently!');
+                      }
+                    },
+                    title: state.formzStatus.isSubmissionInProgress
+                        ? null
+                        : "Reset Password",
+                    fillColor: true,
+                  ),
+                  SizedBox(height: 25.h),
+                  
+                ],
+              ),
             ),
-            SizedBox(height: 25.h),
-          ]),
-        ),
+          );
+        },
       ),
     );
   }

@@ -1,8 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:meta/meta.dart';
 import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:vlog_app/data/repositories/auth_repository.dart';
 import 'package:formz/formz.dart';
@@ -33,25 +31,18 @@ class AuthCubit extends Cubit<AuthState> {
 
   void changeUser({required UserModel user}) {
     emit(
-        state.copyWith(user: user, formzStatus: FormzStatus.submissionSuccess));
+      state.copyWith(user: user, formzStatus: FormzStatus.submissionSuccess),
+    );
   }
 
-  Future<bool> registerUser({required UserModel userModel}) async {
+  Future<void> registerUser({required UserModel userModel}) async {
     emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
     try {
-      bool data = await authRepository.registerUser(user: userModel);
-      if (data) {
-        emit(
-          state.copyWith(
-              user: userModel, formzStatus: FormzStatus.submissionSuccess),
-        );
-        debugPrint('BUNDAY FOYDALANUVCHI YOQ EKAN');
-        return true;
-      } else {
-        emit(state.copyWith(formzStatus: FormzStatus.invalid));
-        debugPrint('BUNDAY FOYDALANUVCHI MAVJUD');
-        return false;
-      }
+      await authRepository.registerUser(user: userModel);
+      emit(
+        state.copyWith(
+            user: userModel, formzStatus: FormzStatus.submissionSuccess),
+      );
     } catch (e) {
       emit(state.copyWith(
           formzStatus: FormzStatus.submissionFailure, errorText: e.toString()));
@@ -66,7 +57,7 @@ class AuthCubit extends Cubit<AuthState> {
       debugPrint('------ USER LOGINED -------');
       await StorageService.instance.storage.write('token', data['token']);
       debugPrint(
-          '------ USER TOKEN WRITED: ${StorageService.instance.storage.read('token')} -------');
+          '------ USER TOKEN WRITED -------\ntoken: ${StorageService.instance.storage.read('token')}');
       debugPrint('------------- USER AUTHORIZED --------------');
       emit(state.copyWith(
           formzStatus: FormzStatus.submissionSuccess,
@@ -81,7 +72,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<bool> verifyEmail({required int code}) async {
     emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
     try {
-      debugPrint('EMAIL: ${state.user.email}\n CODE:${code}');
+      debugPrint('EMAIL: ${state.user.email}\nCODE:${code}');
       await authRepository.verifyEmail(email: state.user.email, code: code);
       emit(state.copyWith(
           formzStatus: FormzStatus.submissionSuccess, code: code));
@@ -93,27 +84,17 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<bool> sendCodeToEmail({required String email}) async {
+  Future<void> sendCodeToEmail({required String email}) async {
     emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
     try {
       await authRepository.sendCodeToEmail(email: email);
       debugPrint('CODE SENT TO EMAIL: ${state.user.email}');
-      emit(state.copyWith(
+      emit(
+        state.copyWith(
           formzStatus: FormzStatus.submissionSuccess,
-          user: state.user.copyWith(email: email)));
-      return true;
-    } catch (e) {
-      emit(state.copyWith(
-          formzStatus: FormzStatus.submissionFailure, errorText: e.toString()));
-      rethrow;
-    }
-  }
-
-  Future<void> _authorize() async {
-    emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
-    try {
-      await authRepository.authorize();
-      emit(state.copyWith(formzStatus: FormzStatus.submissionSuccess));
+          user: state.user.copyWith(email: email),
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(
           formzStatus: FormzStatus.submissionFailure, errorText: e.toString()));

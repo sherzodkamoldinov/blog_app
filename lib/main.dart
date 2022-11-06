@@ -21,7 +21,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await StorageRepository.getInstance();
   await ScreenUtil.ensureScreenSize();
-  await StorageService.init();
+  StorageService.init();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -105,7 +105,7 @@ class MyApp extends StatelessWidget {
             appBarTheme: const AppBarTheme(backgroundColor: Colors.orange)
           ),
           onGenerateRoute: MyRouter.generateRoute,
-          initialRoute: testView // mainPage,
+          initialRoute: splashView // mainPage,
           ),
     );
   }

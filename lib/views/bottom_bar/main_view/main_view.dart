@@ -158,13 +158,12 @@ class _MainViewState extends State<MainView> {
                         itemCount: blogState.blogPosts.length,
                         itemBuilder: (BuildContext context, int index) {
                           var userName = userState.users
-                                  .where((element) =>
-                                      element.id ==
-                                      blogState.blogPosts[index].userId)
-                                  .toList()[0];
+                              .where((element) =>
+                                  element.id ==
+                                  blogState.blogPosts[index].userId)
+                              .toList()[0];
                           return InkWell(
                             onTap: () async {
-                              
                               Navigator.pushNamed(context, readMoreView,
                                   arguments: [
                                     // text
@@ -180,19 +179,20 @@ class _MainViewState extends State<MainView> {
                             child: blogItem(
                                 title: blogState.blogPosts[index].title,
                                 imageUrl: blogState.blogPosts[index].imageUrl,
-                                userName: '${userName.firstName} ${userName.lastName}',
+                                userName:
+                                    '${userName.firstName} ${userName.lastName}',
                                 text: blogState.blogPosts[index].description,
                                 onPressed: () {
                                   Navigator.pushNamed(context, readMoreView,
                                       arguments: [
-                                       // text
-                                    blogState.blogPosts[index].description,
-                                    // title
-                                    blogState.blogPosts[index].title,
-                                    // user image
-                                    blogState.blogPosts[index].imageUrl,
-                                    //user name
-                                    '${userName.firstName} ${userName.lastName}'
+                                        // text
+                                        blogState.blogPosts[index].description,
+                                        // title
+                                        blogState.blogPosts[index].title,
+                                        // user image
+                                        blogState.blogPosts[index].imageUrl,
+                                        //user name
+                                        '${userName.firstName} ${userName.lastName}'
                                       ]);
                                 }),
                           );

@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:formz/formz.dart';
-import 'package:lottie/lottie.dart';
 import 'package:vlog_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/constants.dart';
-import 'package:vlog_app/utils/icon.dart';
 import 'package:vlog_app/utils/my_utils.dart';
 import 'package:vlog_app/utils/style.dart';
 import 'package:vlog_app/views/widgest/custom_appbar.dart';
@@ -69,7 +65,12 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state.formzStatus.isSubmissionFailure) {
+          MyUtils.showSnackBar(context, state.errorText);
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: MyColors.backgroundColor,
@@ -163,7 +164,9 @@ class _RegisterViewState extends State<RegisterView> {
                             if (isValidForm) {
                               if (_confirmPasswordController.text ==
                                   _passwordController.text) {
-                                var isNotExist = await context.read<AuthCubit>().registerUser(
+                                await context
+                                    .read<AuthCubit>()
+                                    .registerUser(
                                       userModel: UserModel(
                                         id: -1,
                                         firstName: _firstNameController.text,
@@ -174,14 +177,9 @@ class _RegisterViewState extends State<RegisterView> {
                                         password: _passwordController.text,
                                       ),
                                     );
-                                   
-                                if (isNotExist) {
-                                  Navigator.pushNamed(context, verifyCodeView,
-                                      arguments: loginView);
-                                } else if (!isNotExist) {
-                                  MyUtils.showSnackBar(context,
-                                      'Such a User exists, please login');
-                                }
+
+                                Navigator.pushNamed(context, verifyCodeView,
+                                    arguments: loginView);
                               } else {
                                 MyUtils.showSnackBar(
                                     context, "Passwords should be equel");

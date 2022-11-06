@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/constants.dart';
-import 'package:vlog_app/utils/icon.dart';
 import 'package:vlog_app/utils/style.dart';
 import 'package:vlog_app/views/widgest/custom_botton.dart';
 
@@ -18,6 +17,7 @@ class _AuthViewState extends State<AuthView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: MyColors.backgroundColor,
@@ -30,6 +30,7 @@ class _AuthViewState extends State<AuthView> {
       ),
       body: Column(
         children: [
+          // TITLE OF PAGE
           Expanded(
             child: Column(
               children: [
@@ -45,6 +46,8 @@ class _AuthViewState extends State<AuthView> {
               ],
             ),
           ),
+
+          // SUBTITLE OF PAGE
           Expanded(
             child: RichText(
               text: TextSpan(children: [
@@ -64,6 +67,8 @@ class _AuthViewState extends State<AuthView> {
               ]),
             ),
           ),
+
+          // CUSTOM BUTTONS
           Expanded(
               child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 30.w),
@@ -84,7 +89,9 @@ class _AuthViewState extends State<AuthView> {
                 customBotton(
                     onPressed: () {
                       Navigator.pushNamed(context, registerView);
-                    }, title: "Register", fillColor: true)
+                    },
+                    title: "Register",
+                    fillColor: true)
               ],
             ),
           )),
