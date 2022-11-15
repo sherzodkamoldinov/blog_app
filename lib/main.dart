@@ -105,7 +105,7 @@ class MyApp extends StatelessWidget {
             appBarTheme: const AppBarTheme(backgroundColor: Colors.orange)
           ),
           onGenerateRoute: MyRouter.generateRoute,
-          initialRoute: splashView // mainPage,
+          initialRoute: testView // mainPage,
           ),
     );
   }

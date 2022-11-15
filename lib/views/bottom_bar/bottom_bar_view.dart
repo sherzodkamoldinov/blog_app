@@ -33,16 +33,16 @@ class _BottomBarViewState extends State<BottomBarView> {
   @override
   void initState() {
     super.initState();
-    _init();
+    // _init();
   }
 
-  _init() async {
-    UserModel user =
-        await BlocProvider.of<UsersCubit>(context).getCurrentUser();
-        await BlocProvider.of<UsersCubit>(context).getAllUser();
-    BlocProvider.of<AuthCubit>(context).changeUser(user: user);
-    debugPrint(user.toString());
-  }
+  // _init() async {
+  //   UserModel user =
+  //       await BlocProvider.of<UsersCubit>(context).getCurrentUser();
+  //       await BlocProvider.of<UsersCubit>(context).getAllUser();
+  //   BlocProvider.of<AuthCubit>(context).changeUser(user: user);
+  //   debugPrint(user.toString());
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vlog_app/cubits/auth_cubit/auth_cubit.dart';
-import 'package:formz/formz.dart';
-import 'package:vlog_app/data/models/blog/blog_model.dart';
+import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:vlog_app/data/services/api/api_client.dart';
 import 'package:vlog_app/data/services/api/api_provider.dart';
-import 'package:vlog_app/main.dart';
+import 'package:vlog_app/data/services/local/storage_service.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/icon.dart';
 import 'package:vlog_app/utils/my_utils.dart';
@@ -20,54 +16,69 @@ class TestView extends StatefulWidget {
 }
 
 class _TestViewState extends State<TestView> {
-  final emailCon = TextEditingController();
-  final passCon = TextEditingController();
+  final nameCon = TextEditingController();
+  final surnameCon = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String myImage = '';
+  String data = '';
 
   XFile? _image;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  _init() async {
+    var token = StorageService.instance.storage.read("token");
+    if (token == null) {
+      await StorageService.instance.storage.write('token',
+          'eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjQwIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTY2ODUyOTg3OSwiaXNzIjoiSGF2ZSBhIG5pY2UgZGF5LCB0b2RheSIsImF1ZCI6IkJsb2dBcHAifQ.4aFDaYeR6KeYFdOXCBRKMf3ndm-e-QLMVI-rdyxP_WU');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // TODO: image picker to addblog //
     return Scaffold(
+      backgroundColor: MyColors.richBlack,
       appBar: AppBar(),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              _getFromGallery();
-            },
-            child: const Text('select image'),
-          ),
-          SizedBox(
-            child: myImage.isNotEmpty
-                ? Image.network(myImage)
-                : Image.asset(MyIcons.imageSample),
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                _getFromGallery();
+              },
+              child: const Text('select image'),
+            ),
+            SizedBox(
+              child: myImage.isNotEmpty
+                  ? Image.network(myImage)
+                  : Image.asset(MyIcons.imageSample),
+            ),
+            TextField(
+              controller: nameCon,
+              decoration: MyUtils.getInputDecoration(label: 'name'),
+            ),
+            TextField(
+              controller: surnameCon,
+              decoration: MyUtils.getInputDecoration(label: 'surname'),
+            ),
+            const Center(
+              child: Text("DATA:"),
+            ),
+            Text(data),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(onPressed: () async {
-        print(_image?.name);
         try {
-          Map<String, dynamic> a =
-              await ApiProvider(apiClient: ApiClient()).addBlog(
-            blogModel: BlogModel(
-              id: 1,
-              title: 'title',
-              description: 'description',
-              type: '1',
-              subtitle: 'subtitle',
-              imageUrl: 'imageUrl',
-              createdAt: 'createdAt',
-              userId: 1,
-            ),
-            file: _image,
-          );
-          setState(() {
-            myImage = 'https://blogappuz.herokuapp.com/' + a['image'];
-          });
-          _image = null;
+              await ApiProvider(apiClient: ApiClient()).deleteUser();
         } catch (e) {
           print('ERROR ON PAGE: $e}');
+          MyUtils.showSnackBar(context, e.toString());
         }
       }),
     );

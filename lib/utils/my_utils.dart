@@ -85,26 +85,26 @@ class MyUtils {
       fontSize: 16.0,
     );
   }
-}
 
-InputDecoration getInputDecoration({required String label}) {
-  return InputDecoration(
-    labelText: label,
-    labelStyle: MyTextStyle.sfProRegular.copyWith(
-      color: MyColors.white,
-      fontSize: 16,
-    ),
-    border: const OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(4)),
-      borderSide: BorderSide(
-        width: 1,
+  static InputDecoration getInputDecoration({required String label}) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: MyTextStyle.sfProRegular.copyWith(
+        color: MyColors.white,
+        fontSize: 16,
       ),
-    ),
-    enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(width: 1, color: Colors.white)),
-    focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(width: 1, color: Colors.white)),
-    errorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(width: 1, color: Colors.white)),
-  );
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+        borderSide: BorderSide(
+          width: 1,
+        ),
+      ),
+      enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(width: 1, color: Colors.white)),
+      focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(width: 1, color: Colors.white)),
+      errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(width: 1, color: Colors.white)),
+    );
+  }
 }

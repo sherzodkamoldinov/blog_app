@@ -20,7 +20,7 @@ class AuthRepository {
   Future<void> sendCodeToEmail({required String email}) =>
       _apiProvider.sendCodeToEmail(email: email);
 
-  Future<bool> resetPassword(
+  Future<void> resetPassword(
           {required String email,
           required int code,
           required String password}) =>

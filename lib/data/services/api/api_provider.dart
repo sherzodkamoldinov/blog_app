@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vlog_app/data/models/blog/blog_model.dart';
@@ -72,7 +74,7 @@ class ApiProvider {
 
       debugPrint('=== DIO VERIFY ===');
       debugPrint('${response.statusCode}');
-      
+
     } on DioError catch (e) {
       debugPrint("*** DIO VERIFY ERROR ***\n ${e.response?.data}");
       if (e.response?.data is Map<String, dynamic>) {
@@ -84,126 +86,217 @@ class ApiProvider {
     }
   }
 
-  Future<bool> sendCodeToEmail({required String email}) async {
-    Response response = await apiClient.dio.post(
-      "${apiClient.dio.options.baseUrl}/api/accounts/send-code-to-email",
-      data: {
-        'email': email,
-      },
-    );
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      return true;
-    } else {
-      throw Exception();
+  Future<void> sendCodeToEmail({required String email}) async {
+    try {
+      Response response = await apiClient.dio.post(
+        "${apiClient.dio.options.baseUrl}/api/accounts/send-code-to-email",
+        data: {
+          'email': email,
+        },
+      );
+
+      debugPrint('=== DIO SEND CODE TO EMAIL ===');
+      debugPrint('${response.statusCode}');
+    } on DioError catch (e) {
+      debugPrint("*** DIO SEND CODE TO EMAIL ERROR ***\n ${e.response?.data}");
+      if (e.response != null) {
+        if (e.response!.statusCode! >= 500) {
+          throw ('Server Error');
+        }
+      }
     }
   }
 
-  Future<bool> resetPassword(
+  Future<void> resetPassword(
       {required String email,
       required int code,
       required String password}) async {
-    Response response = await apiClient.dio.post(
-      "${apiClient.dio.options.baseUrl}/api/accounts/reset-password",
-      data: {
-        'email': email,
-        'code': code,
-        'password': password,
-      },
-    );
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      return true;
-    } else {
-      throw Exception();
+    try {
+      Response response = await apiClient.dio.post(
+        "${apiClient.dio.options.baseUrl}/api/accounts/reset-password",
+        data: {
+          'email': email,
+          'code': code,
+          'password': password,
+        },
+      );
+
+      debugPrint('=== DIO RESET PASSWORD ===');
+      debugPrint('${response.statusCode}');
+    } on DioError catch (e) {
+      debugPrint("*** DIO RESET PASSWORD ERROR ***\n ${e.response?.data}");
+      if (e.response != null) {
+        if (e.response!.statusCode! >= 500) {
+          throw ('Server Error');
+        }
+      }
     }
   }
 
   //============================== Users ============================
   Future<List<UserModel>> getAllUsers() async {
-    Response response = await apiClient.dio.get(
-      "${apiClient.dio.options.baseUrl}/api/users",
-      options: Options(
-        headers: {
-          "Authorization":
-              'Bearer ${StorageService.instance.storage.read('token')}'
-        },
-      ),
-    );
+    try {
+      Response response =
+          await apiClient.dio.get("${apiClient.dio.options.baseUrl}/api/users");
 
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      return (response.data as List?)
-              ?.map((user) => UserModel.fromJson(user))
-              .toList() ??
-          [];
-    } else {
-      throw Exception();
+      debugPrint('=== DIO GET ALL USERS ===');
+      debugPrint('${response.statusCode}');
+
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        return (response.data as List?)
+                ?.map((user) => UserModel.fromJson(user))
+                .toList() ??
+            [];
+      } else {
+        debugPrint(
+            "*** DIO GET ALL USERS ERROR ***\ncode: ${response.statusCode}\ndata: ${response.data}");
+        throw Exception();
+      }
+    } on DioError catch (e) {
+      debugPrint(
+          "*** DIO GET ALL USERS ERROR ***\ncode: ${e.response?.statusCode}\ndata: ${e.response?.data}");
+      if (e.response != null) {
+        if (e.response!.statusCode! >= 500) {
+          throw 'Server Error';
+        }
+      }
+      rethrow;
     }
   }
 
   Future<UserModel> getCurrentUser() async {
-    Response response = await apiClient.dio.get(
-      "${apiClient.dio.options.baseUrl}/api/users/user-info",
-      options: Options(
-        headers: {
-          "Authorization":
-              'Bearer ${StorageService.instance.storage.read('token')}'
-        },
-      ),
-    );
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      return UserModel.fromJson(response.data);
-    } else {
-      throw Exception();
+    try {
+      Response response = await apiClient.dio.get(
+        "${apiClient.dio.options.baseUrl}/api/users/user-info",
+        options: Options(
+          headers: {
+            "Authorization":
+                'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNjY4NTI2NjY4LCJpc3MiOiJIYXZlIGEgbmljZSBkYXksIHRvZGF5IiwiYXVkIjoiQmxvZ0FwcCJ9.TfHUkbAIGswtzwNss5qWLXWCG-HeIwvYAsd8QW0a6Ik'
+            // 'Bearer ${StorageService.instance.storage.read('token')}'
+          },
+        ),
+      );
+
+      debugPrint('=== DIO GET CURRENT USER ===');
+      debugPrint('${response.statusCode}');
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        return UserModel.fromJson(response.data);
+      } else {
+        debugPrint(
+            "*** DIO GET CURRENT USER ERROR ***\ncode: ${response.statusCode}\ndata: ${response.data}");
+        throw Exception();
+      }
+    } on DioError catch (e) {
+      debugPrint("*** DIO GET CURRENT USER ERROR ***\n ${e.response?.data}");
+      if (e.response != null) {
+        if (e.response!.statusCode! >= 500) {
+          throw ('Server Error');
+        }
+      }
+      rethrow;
     }
   }
 
   Future<UserModel> getUserById({required int id}) async {
-    Response response = await apiClient.dio.get(
-      "${apiClient.dio.options.baseUrl}/api/users/$id",
-      options: Options(
-        headers: {
-          "Authorization":
-              'Bearer ${StorageService.instance.storage.read('token')}'
-        },
-      ),
-    );
-
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      return UserModel.fromJson(response.data);
-    } else {
-      throw Exception();
+    try {
+      Response response = await apiClient.dio.get(
+        "${apiClient.dio.options.baseUrl}/api/users/$id",
+        options: Options(
+          headers: {
+            "Authorization":
+                'Bearer ${StorageService.instance.storage.read('token')}'
+          },
+        ),
+      );
+      debugPrint('=== DIO GET USER BY ID ===');
+      debugPrint('${response.statusCode}');
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        return UserModel.fromJson(response.data);
+      } else {
+        debugPrint(
+            "*** DIO GET USER BY ID ERROR ***\ncode: ${response.statusCode}\ndata: ${response.data}");
+        throw Exception();
+      }
+    } on DioError catch (e) {
+      debugPrint("*** DIO GET USER BY ID ERROR ***\n ${e.response?.data}");
+      if (e.response?.data is Map<String, dynamic>) {
+        if ((e.response?.data as Map<String, dynamic>).containsKey('message')) {
+          throw e.response?.data['message'];
+        }
+      }
+      rethrow;
     }
   }
 
-  Future<bool> updateUserById({required UserModel user}) async {
-    Response response = await apiClient.dio
-        .put("${apiClient.dio.options.baseUrl}/api/users/${user.id}", data: {
-      'first_name': user.firstName,
-      'last_name': user.lastName,
-      'user_name': user.userName,
-      'email': user.email,
-      'password': user.password
-    });
+  Future<UserModel> updateCurrentUser(
+      {required UserModel user, XFile? file}) async {
+    FormData? formData;
+    String fileName = "";
+    if (file != null) fileName = file.path.split('/').last;
+    formData = FormData.fromMap(
+      {
+        "image": file != null
+            ? await MultipartFile.fromFile(file.path, filename: fileName)
+            : '',
+        "firstName": user.firstName,
+        "lastName": user.lastName
+        // TODO: qo'shmadim ustida o'ylab ko'rish kerak
+        // "userName":'',
+        // "email":'',
+        // "password": ''
+      },
+    );
 
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-      return true;
-    } else {
-      throw Exception();
+    try {
+      Response response = await apiClient.dio.patch(
+        "${apiClient.dio.options.baseUrl}/api/users",
+        data: formData,
+        options: Options(
+          headers: {
+            "Authorization":
+                'Bearer ${StorageService.instance.storage.read('token')}'
+          },
+        ),
+      );
+
+      debugPrint('=== DIO UPDATE CURRENT USER ===');
+      debugPrint('${response.statusCode}');
+
+      return UserModel.fromJson(response.data);
+    } on DioError catch (e) {
+      debugPrint("*** DIO UPDATE CURRENT USER ERROR ***\n ${e.response?.data}");
+      if (e.response != null) {
+        if (e.response!.statusCode! >= 500) {
+          throw ('Server Error');
+        }
+      }
+      rethrow;
     }
   }
 
   Future<void> deleteUser() async {
-    Response response = await apiClient.dio.delete(
-      "${apiClient.dio.options.baseUrl}/api/users}",
-      options: Options(
-        headers: {
-          "Authorization":
-              'Bearer ${StorageService.instance.storage.read('token')}'
-        },
-      ),
-    );
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {
-    } else {
-      throw Exception();
+    try {
+      Response response = await apiClient.dio.delete(
+        "${apiClient.dio.options.baseUrl}/api/users}",
+        options: Options(
+          headers: {
+            "Authorization":
+                // 'Bearer ${StorageService.instance.storage.read('token')}'
+                'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjQwIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTY2ODUyOTg3OSwiaXNzIjoiSGF2ZSBhIG5pY2UgZGF5LCB0b2RheSIsImF1ZCI6IkJsb2dBcHAifQ.4aFDaYeR6KeYFdOXCBRKMf3ndm-e-QLMVI-rdyxP_WU'
+          },
+        ),
+      );
+      debugPrint('=== DIO DELETE CURRENT USER ===');
+      debugPrint('${response.statusCode}');
+    } on DioError catch (e) {
+      debugPrint(
+          "*** DIO DELETE CURRENT USER ERROR***\nmessage: ${e.response?.statusMessage}\ndata: ${e.response?.data}");
+      if (e.response != null) {
+        if (e.response!.statusCode! >= 500) {
+          throw ('Server Error');
+        }
+      }
+      rethrow;
     }
   }
 

@@ -28,12 +28,16 @@ class UsersCubit extends Cubit<UsersState> {
 
   final UsersRepository usersRepository;
 
-  Future<UserModel> getCurrentUser() async {
+  Future<void> getCurrentUser() async {
+    emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
     try {
       UserModel user = await usersRepository.getCurrentUser();
-      return user;
+      emit(state.copyWith(
+          user: user, formzStatus: FormzStatus.submissionSuccess));
     } catch (e) {
-      throw e;
+      emit(state.copyWith(
+          errorText: e.toString(), formzStatus: FormzStatus.submissionFailure));
+      rethrow;
     }
   }
 
@@ -46,20 +50,19 @@ class UsersCubit extends Cubit<UsersState> {
     } catch (e) {
       emit(state.copyWith(
           errorText: e.toString(), formzStatus: FormzStatus.submissionFailure));
-      throw e;
+      rethrow;
     }
   }
 
-  Future<void> getUserById({required int userId}) async {
+  Future<UserModel> getUserById({required int userId}) async {
     emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
     try {
-      UserModel user = await usersRepository.getUserById(id: userId);
-      emit(state.copyWith(
-          user: user, formzStatus: FormzStatus.submissionSuccess));
+      UserModel userById = await usersRepository.getUserById(id: userId);
+      return userById;
     } catch (e) {
       emit(state.copyWith(
           errorText: e.toString(), formzStatus: FormzStatus.submissionFailure));
-      throw e;
+      rethrow;
     }
   }
 
@@ -67,25 +70,28 @@ class UsersCubit extends Cubit<UsersState> {
     try {
       await usersRepository.deleteUser();
       await StorageService.instance.storage.remove('token');
-      clearUser();
+      clearState();
     } catch (e) {
       throw e;
     }
   }
 
-  void clearUser() {
-    emit(state.copyWith(
-      user: UserModel(
-        email: "",
-        firstName: "",
-        id: -1,
-        imageUrl: "",
-        lastName: "",
-        password: "",
-        userName: "",
+  void clearState() {
+    emit(
+      state.copyWith(
+        errorText: '',
+        formzStatus: FormzStatus.pure,
+        user: UserModel(
+          id: -1,
+          email: '',
+          firstName: '',
+          imageUrl: '',
+          lastName: '',
+          password: '',
+          userName: '',
+        ),
+        users: [],
       ),
-      errorText: '',
-      formzStatus: FormzStatus.pure,
-    ));
+    );
   }
 }

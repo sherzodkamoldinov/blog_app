@@ -44,7 +44,7 @@ class _ProfileViewState extends State<ProfileView> {
                           ElevatedButton(
                             onPressed: () {
                               context.read<AuthCubit>().clearUser();
-                              BlocProvider.of<UsersCubit>(context).clearUser();
+                              BlocProvider.of<UsersCubit>(context).clearState();
                               Navigator.pushNamedAndRemoveUntil(
                                   context, authView, (route) => false);
                             },

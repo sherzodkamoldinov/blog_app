@@ -1,3 +1,4 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:vlog_app/data/services/api/api_provider.dart';
 
@@ -12,8 +13,8 @@ class UsersRepository {
   Future<UserModel> getUserById({required int id}) =>
       _apiProvider.getUserById(id: id);
 
-  Future<bool> updateUserById({required UserModel user}) =>
-      _apiProvider.updateUserById(user: user);
+  Future<UserModel> updateUserById({required UserModel user, XFile? file}) =>
+      _apiProvider.updateCurrentUser(user: user, file: file);
 
   Future<void> deleteUser() =>
       _apiProvider.deleteUser();
