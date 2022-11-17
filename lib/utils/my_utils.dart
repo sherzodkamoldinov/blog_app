@@ -1,4 +1,5 @@
 import 'package:formz/formz.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/style.dart';
 import 'package:flutter/material.dart';
@@ -90,7 +91,7 @@ class MyUtils {
     return InputDecoration(
       labelText: label,
       labelStyle: MyTextStyle.sfProRegular.copyWith(
-        color: MyColors.white,
+        color: MyColors.richBlack,
         fontSize: 16,
       ),
       border: const OutlineInputBorder(
@@ -100,11 +101,31 @@ class MyUtils {
         ),
       ),
       enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(width: 1, color: Colors.white)),
+          borderSide: BorderSide(width: 1, color: MyColors.richBlack)),
       focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(width: 1, color: Colors.white)),
+          borderSide: BorderSide(width: 1, color: MyColors.richBlack)),
       errorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(width: 1, color: Colors.white)),
+          borderSide: BorderSide(width: 1, color: MyColors.richBlack)),
     );
+  }
+
+  static Future<XFile?> getFromGallery() async {
+    XFile? pickedFile = await ImagePicker().pickImage(
+      maxWidth: 500,
+      maxHeight: 500,
+      source: ImageSource.gallery,
+    );
+
+    return pickedFile;
+  }
+
+  static Future<XFile?> getFromCamera() async {
+    XFile? pickedFile = await ImagePicker().pickImage(
+      maxWidth: 500,
+      maxHeight: 500,
+      source: ImageSource.camera,
+    );
+
+    return pickedFile;
   }
 }

@@ -16,5 +16,6 @@ const String homeView = '/home_view';
 const String mainView = '/home_view/main_view';
 const String readMoreView = '/home_view/main_view/read_more_view';
 const String addBlogView = '/home_view/add_blog_view';
+const String settingsView = '/home_view/profile_view/settings_view';
 
 const String BASE_URL = 'https://blogappuz.herokuapp.com';

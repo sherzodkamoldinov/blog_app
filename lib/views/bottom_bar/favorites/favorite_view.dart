@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vlog_app/data/models/blog/blog_model.dart';
+import 'package:vlog_app/data/models/helper/action_model.dart';
+import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/constants.dart';
 import 'package:vlog_app/utils/icon.dart';
@@ -22,8 +25,12 @@ class _FavoritesViewState extends State<FavoritesView> {
       backgroundColor: MyColors.backgroundColor,
       appBar: CustomAppBarWithDrawer(
         title: "My Favorite List",
-        actionIcon: Icons.delete,
-        onPressed: () {},
+        actions: [
+          ActionModel(
+            icon: Icons.delete,
+            onPressed: () {},
+          ),
+        ],
       ),
       drawer: const CustomDrawer(),
       body: SizedBox(
@@ -42,11 +49,8 @@ class _FavoritesViewState extends State<FavoritesView> {
                 ]);
               },
               child: blogItem(
-                  title: "Please Start Writing Better Git",
-                  imageUrl: "",
-                  userName: "Sherzod Kamoldinov",
-                  text:
-                      "Writing Better Git Commits Please Start Writing Better Git Commits Please Start Writing Better Git Commits Please Start Writing Better Git Commits Please Start Writing Better Git Commits",
+                 blog: BlogModel(id: 0, title: 'title', description: 'description', type: '', subtitle: 'subtitle', imageUrl: 'imageUrl', createdAt: 'createdAt', userId: 1),
+                 user: UserModel(id: 1, firstName: 'firstName', lastName: 'lastName', userName: 'userName', email: 'email', imageUrl: 'imageUrl', password: ''),
                   onPressed: () {
                     Navigator.pushNamed(context, readMoreView, arguments: [
                       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",

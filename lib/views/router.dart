@@ -8,6 +8,7 @@ import 'package:vlog_app/views/bottom_bar/bottom_bar_view.dart';
 import 'package:vlog_app/views/bottom_bar/main_view/main_view.dart';
 import 'package:vlog_app/views/bottom_bar/my_blogs_view/add_blog/add_blog_view.dart';
 import 'package:vlog_app/views/read_more_view/read_more_view.dart';
+import 'package:vlog_app/views/settings_view/settings_view.dart';
 import 'package:vlog_app/views/splash/splash_page.dart';
 import 'package:vlog_app/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -42,14 +43,14 @@ class MyRouter {
         return MaterialPageRoute(builder: (_) => const MainView());
       case addBlogView:
         return MaterialPageRoute(builder: (_) => const AddBlog());
+      case settingsView:
+        return MaterialPageRoute(builder: (_) => const SettingsView());
       case readMoreView:
         var a = settings.arguments as List;
         return MaterialPageRoute(
           builder: (_) => ReadMoreView(
-            text: a[0],
-            title: a[1],
-            userImageUrl: a[2],
-            userName: a[3],
+            blogModel: a[0],
+            userModel: a[1],
           ),
         );
       default:

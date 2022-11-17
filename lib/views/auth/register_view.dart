@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -74,7 +75,7 @@ class _RegisterViewState extends State<RegisterView> {
       builder: (context, state) {
         return Scaffold(
           backgroundColor: MyColors.backgroundColor,
-          appBar: const CustomAppBar(title: "Register"),
+          appBar: CustomAppBar(title: tr('register')),
           body: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -85,7 +86,7 @@ class _RegisterViewState extends State<RegisterView> {
                   children: [
                     // TITLE
                     Text(
-                      "Hello user, you have a greatful journey!",
+                      tr('register_title'),
                       style: MyTextStyle.sfProRegular.copyWith(fontSize: 32.sp),
                     ),
                     SizedBox(height: 10.h),
@@ -118,7 +119,7 @@ class _RegisterViewState extends State<RegisterView> {
                       type: 'text',
                       controller: _userNameController,
                       isPassword: false,
-                      text: "Enter your User Name",
+                      text: tr('enter_your_username'),
                       focusNode: _userNameFocusNode,
                       nextFocusNode: _emailFocusNode,
                     ),
@@ -128,7 +129,7 @@ class _RegisterViewState extends State<RegisterView> {
                       type: 'email',
                       controller: _emailController,
                       isPassword: false,
-                      text: "Enter your Email",
+                      text: tr('enter_your_email'),
                       focusNode: _emailFocusNode,
                       nextFocusNode: _passwordFocusNode,
                     ),
@@ -138,18 +139,19 @@ class _RegisterViewState extends State<RegisterView> {
                       type: 'password',
                       controller: _passwordController,
                       isPassword: true,
-                      text: "Password",
+                      text: tr('enter_your_password'),
                       focusNode: _passwordFocusNode,
                       nextFocusNode: _confirmPasswordFocusNode,
                     ),
 
                     SizedBox(height: 15.h),
                     CustomTextField(
-                      type: 'password',
+                      type: 'confirm',
                       isEnd: true,
                       controller: _confirmPasswordController,
+                      confirm: _passwordController,
                       isPassword: true,
-                      text: "Confirm Password",
+                      text: tr('confirm_password'),
                       focusNode: _confirmPasswordFocusNode,
                       nextFocusNode: _confirmPasswordFocusNode,
                     ),
@@ -162,35 +164,28 @@ class _RegisterViewState extends State<RegisterView> {
                             final isValidForm =
                                 formKey.currentState!.validate();
                             if (isValidForm) {
-                              if (_confirmPasswordController.text ==
-                                  _passwordController.text) {
-                                await context
-                                    .read<AuthCubit>()
-                                    .registerUser(
-                                      userModel: UserModel(
-                                        id: -1,
-                                        firstName: _firstNameController.text,
-                                        lastName: _lastNameController.text,
-                                        userName: _userNameController.text,
-                                        email: _emailController.text,
-                                        imageUrl: '',
-                                        password: _passwordController.text,
-                                      ),
-                                    );
+                              await context.read<AuthCubit>().registerUser(
+                                    userModel: UserModel(
+                                      id: -1,
+                                      firstName: _firstNameController.text,
+                                      lastName: _lastNameController.text,
+                                      userName: _userNameController.text,
+                                      email: _emailController.text,
+                                      imageUrl: '',
+                                      password: _passwordController.text,
+                                    ),
+                                  );
 
-                                Navigator.pushNamed(context, verifyCodeView,
-                                    arguments: loginView);
-                              } else {
-                                MyUtils.showSnackBar(
-                                    context, "Passwords should be equel");
-                              }
+                              Navigator.pushNamed(context, verifyCodeView,
+                                  arguments: loginView);
                             } else {
-                              MyUtils.showSnackBar(context, "Field Currently");
+                              MyUtils.showSnackBar(
+                                  context, tr('please_fill_right'));
                             }
                           },
                           title: state.formzStatus.isSubmissionInProgress
                               ? null
-                              : "Register",
+                              : tr('register'),
                           fillColor: true,
                         );
                       },
@@ -204,17 +199,18 @@ class _RegisterViewState extends State<RegisterView> {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: "Already have an accaount? ",
+                              text: tr('have_an_account'),
                               style: MyTextStyle.sfProRegular,
                             ),
                             TextSpan(
-                              text: "Login",
+                              text: tr('sign_in'),
                               style: MyTextStyle.sfProSemibold,
                             ),
                           ],
                         ),
                       ),
                     ),
+                    SizedBox(height: 20.h),
                   ],
                 ),
               ),

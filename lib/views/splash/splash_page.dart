@@ -18,6 +18,7 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
+    print('ishladi 1');
     _init();
     super.initState();
   }
@@ -38,14 +39,13 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<void> _init() async {
     await Future.delayed(
-      const Duration(seconds: 1),
-      () {
+      const Duration(seconds: 3),
+      () async{
         String? token = StorageService.instance.storage.read('token');
         if (token == null) {
           Navigator.pushReplacementNamed(context, authView);
         } else {
-          debugPrint(
-              "$token and ${StorageService.instance.storage.read('id')}");
+          debugPrint("TOKEN: $token");
           Navigator.pushReplacementNamed(context, homeView);
         }
       },

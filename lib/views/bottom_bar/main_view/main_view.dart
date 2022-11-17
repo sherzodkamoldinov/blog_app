@@ -1,7 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:vlog_app/cubits/blogs_cubit/blogs_cubit.dart';
+import 'package:vlog_app/cubits/type_cubit/type_cubit.dart';
 import 'package:vlog_app/cubits/users_cubit/users_cubit.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/constants.dart';
@@ -10,6 +13,7 @@ import 'package:vlog_app/utils/style.dart';
 import 'package:vlog_app/views/widgest/blog_item.dart';
 import 'package:vlog_app/views/widgest/custom_appbar_with_drawer.dart';
 import 'package:vlog_app/views/widgest/custom_drawer.dart';
+import 'package:formz/formz.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -19,7 +23,7 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  int activeCategory = 0;
+  int activeType = 0;
   late TextEditingController _controller;
   late FocusNode _focusNode;
 
@@ -97,56 +101,89 @@ class _MainViewState extends State<MainView> {
               ),
             ),
             SizedBox(height: 35.h),
+
             // CATEGORIES
-            SizedBox(
-              height: 55.h,
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.only(left: 5.w),
-                scrollDirection: Axis.horizontal,
-                children: [
-                  ...List.generate(
-                    8,
-                    (index) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            activeCategory = index;
-                          });
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 20.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Type $index",
-                                  style: MyTextStyle.sfProLight.copyWith(
-                                      fontSize: activeCategory == index
-                                          ? 20.sp
-                                          : 18.sp,
-                                      fontWeight: activeCategory == index
-                                          ? FontWeight.w600
-                                          : FontWeight.w400,
-                                      color: activeCategory == index
-                                          ? MyColors.richBlack
-                                          : MyColors.grey.withOpacity(0.8))),
-                              activeCategory == index
-                                  ? SizedBox(
-                                      width: 40.w,
-                                      child: Divider(
-                                        height: 22.h,
-                                        thickness: 3.h,
-                                        endIndent: 0,
-                                        indent: 0,
-                                        color: MyColors.richBlack,
-                                      ))
-                                  : const SizedBox(),
-                            ],
+            BlocBuilder<TypeCubit, TypeState>(
+              builder: (context, typeState) {
+                return SizedBox(
+                  height: 55.h,
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.only(left: 5.w),
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      if (!typeState.status.isSubmissionSuccess)
+                        ...List.generate(
+                          5,
+                          (index) => Padding(
+                            padding: EdgeInsets.only(bottom: 15.h),
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.grey.shade300,
+                              highlightColor: Colors.grey.shade100,
+                              enabled: true,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  color: Colors.white,
+                                ),
+                                width: 70.w,
+                                margin: EdgeInsets.only(right: 20.w),
+                              ),
+                            ),
                           ),
-                        )),
+                        )
+                      else if (typeState.status.isSubmissionSuccess)
+                        ...List.generate(
+                          typeState.types.length + 1,
+                          (index) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                activeType = index;
+                              });
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 20.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      index == 0
+                                          ? tr('all')
+                                          : typeState.types[index - 1].name,
+                                      style: MyTextStyle.sfProLight.copyWith(
+                                          fontSize: activeType == index
+                                              ? 20.sp
+                                              : 18.sp,
+                                          fontWeight: activeType == index
+                                              ? FontWeight.w600
+                                              : FontWeight.w400,
+                                          color: activeType == index
+                                              ? MyColors.richBlack
+                                              : MyColors.grey
+                                                  .withOpacity(0.8))),
+                                  activeType == index
+                                      ? SizedBox(
+                                          width: 30.w,
+                                          child: Divider(
+                                            height: 22.h,
+                                            thickness: 3.h,
+                                            endIndent: 0,
+                                            indent: 0,
+                                            color: MyColors.richBlack,
+                                          ),
+                                        )
+                                      : const SizedBox(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
+
             // BLOG ITEMS
             BlocBuilder<UsersCubit, UsersState>(
               builder: (context, userState) {
@@ -157,44 +194,34 @@ class _MainViewState extends State<MainView> {
                         physics: const BouncingScrollPhysics(),
                         itemCount: blogState.blogPosts.length,
                         itemBuilder: (BuildContext context, int index) {
-                          var userName = userState.users
+                          var user = userState.users
                               .where((element) =>
                                   element.id ==
                                   blogState.blogPosts[index].userId)
                               .toList()[0];
+                          var blog = blogState.blogPosts[index];
                           return InkWell(
                             onTap: () async {
                               Navigator.pushNamed(context, readMoreView,
                                   arguments: [
-                                    // text
-                                    blogState.blogPosts[index].description,
-                                    // title
-                                    blogState.blogPosts[index].title,
-                                    // user image
-                                    blogState.blogPosts[index].imageUrl,
-                                    //user name
-                                    '${userName.firstName} ${userName.lastName}'
+                                    blog,
+                                    user,
                                   ]);
                             },
                             child: blogItem(
-                                title: blogState.blogPosts[index].title,
-                                imageUrl: blogState.blogPosts[index].imageUrl,
-                                userName:
-                                    '${userName.firstName} ${userName.lastName}',
-                                text: blogState.blogPosts[index].description,
-                                onPressed: () {
-                                  Navigator.pushNamed(context, readMoreView,
-                                      arguments: [
-                                        // text
-                                        blogState.blogPosts[index].description,
-                                        // title
-                                        blogState.blogPosts[index].title,
-                                        // user image
-                                        blogState.blogPosts[index].imageUrl,
-                                        //user name
-                                        '${userName.firstName} ${userName.lastName}'
-                                      ]);
-                                }),
+                              blog: blog,
+                              user: user,
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  readMoreView,
+                                  arguments: [
+                                    blog,
+                                    user,
+                                  ],
+                                );
+                              },
+                            ),
                           );
                         },
                       ),

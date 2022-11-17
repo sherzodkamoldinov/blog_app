@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -50,18 +51,19 @@ class _AuthViewState extends State<AuthView> {
           // SUBTITLE OF PAGE
           Expanded(
             child: RichText(
+              textAlign: TextAlign.center,
               text: TextSpan(children: [
                 TextSpan(
-                  text: "Tell your ",
+                  text: tr('auth_sub_text_1'),
                   style: MyTextStyle.sfProLight.copyWith(fontSize: 24.sp),
                 ),
                 TextSpan(
-                  text: "story ",
+                  text: tr('auth_sub_text_2'),
                   style: MyTextStyle.sfProMedium
                       .copyWith(fontSize: 24.sp, color: MyColors.ntColor),
                 ),
                 TextSpan(
-                  text: "with us.",
+                  text: tr('auth_sub_text_3'),
                   style: MyTextStyle.sfProLight.copyWith(fontSize: 24.sp),
                 ),
               ]),
@@ -78,11 +80,11 @@ class _AuthViewState extends State<AuthView> {
                     onPressed: () {
                       Navigator.pushNamed(context, loginView);
                     },
-                    title: "Login",
+                    title: tr('login'),
                     fillColor: false),
                 SizedBox(height: 20.h),
                 Text(
-                  "New here?",
+                  tr('now_here'),
                   style: MyTextStyle.sfProLight.copyWith(fontSize: 18.sp),
                 ),
                 SizedBox(height: 5.h),
@@ -90,7 +92,7 @@ class _AuthViewState extends State<AuthView> {
                     onPressed: () {
                       Navigator.pushNamed(context, registerView);
                     },
-                    title: "Register",
+                    title: tr('register'),
                     fillColor: true)
               ],
             ),

@@ -2,22 +2,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vlog_app/data/models/blog/blog_model.dart';
+import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/icon.dart';
 
 import '../../utils/style.dart';
 
 class ReadMoreView extends StatefulWidget {
-  const ReadMoreView(
-      {super.key,
-      required this.title,
-      required this.text,
-      required this.userImageUrl,
-      required this.userName});
-  final String title;
-  final String userImageUrl;
-  final String userName;
-  final String text;
+  const ReadMoreView({super.key, required this.blogModel, required this.userModel});
+  final BlogModel blogModel;
+  final UserModel userModel;
 
   @override
   State<ReadMoreView> createState() => _ReadMoreViewState();
@@ -51,13 +46,11 @@ class _ReadMoreViewState extends State<ReadMoreView> {
             IconButton(
                 onPressed: () {
                   isFavorite = !isFavorite;
-                  setState(() {
-                    
-                  });
+                  setState(() {});
                 },
                 icon: Icon(
                   Icons.favorite,
-                  color: isFavorite ? MyColors.red: MyColors.richBlack,
+                  color: isFavorite ? MyColors.red : MyColors.richBlack,
                 ))
           ]),
       body: SingleChildScrollView(
@@ -70,11 +63,12 @@ class _ReadMoreViewState extends State<ReadMoreView> {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  widget.title,
+                  widget.blogModel.title,
                   style: MyTextStyle.sfProSemibold.copyWith(fontSize: 34.sp),
                 ),
               ),
               SizedBox(height: 5.h),
+             
               // USER INFO
               Row(
                 children: [
@@ -89,7 +83,7 @@ class _ReadMoreViewState extends State<ReadMoreView> {
                   SizedBox(width: 15.w),
                   Expanded(
                     child: Text(
-                      widget.userName,
+                      widget.userModel.userName,
                       style: MyTextStyle.sfProRegular
                           .copyWith(color: MyColors.grey, fontSize: 22.sp),
                     ),
@@ -110,11 +104,12 @@ class _ReadMoreViewState extends State<ReadMoreView> {
                 indent: 3.w,
                 endIndent: 3.w,
               ),
+             
               // TEXT
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  widget.text,
+                  widget.blogModel.description,
                   style: MyTextStyle.sfProLight
                       .copyWith(color: MyColors.richBlack, fontSize: 28.sp),
                 ),

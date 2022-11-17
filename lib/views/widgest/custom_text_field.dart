@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vlog_app/utils/color.dart';
@@ -48,24 +49,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
       validator: (value) {
         switch (widget.type) {
           case 'email':
-            if (value != null && !EmailValidator.validate(value)) {
-              return "Enter a valid email";
+            if (value != null && !EmailValidator.validate(value.trim())) {
+              return tr('valid_email');
             }
             return null;
           case 'password':
-            if (value != null && value.length < 8) {
-              return "Length should be large than 7";
+            if (value != null && value.trim().length < 8) {
+              return tr('valid_password');
             }
             return null;
           case 'confirm':
             if (value != null &&
-                widget._controller.text != widget._confirm!.text) {
-              return 'Both password must match';
+                widget._controller.text.trim() != widget._confirm!.text.trim()) {
+              return tr('valid_confirm');
             }
             return null;
           case 'text':
-            if (value != null && value.isEmpty) {
-              return "Enter Current text";
+            if (value != null && value.trim().isEmpty) {
+              return tr('valid_text');
             }
             return null;
           default:
@@ -82,7 +83,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       // },
       obscureText: widget._isPassword ? isPressed : false,
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5),
+        contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
         hintText: widget._text,
         hintStyle: MyTextStyle.sfProLight.copyWith(color: MyColors.grey),
         suffixIcon: widget._isPassword
@@ -99,19 +100,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
               )
             : const SizedBox(),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: MyColors.grey),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: MyColors.richBlack),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: MyColors.red),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: MyColors.red),
         ),
       ),

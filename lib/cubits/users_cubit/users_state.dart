@@ -13,7 +13,6 @@ class UsersState extends Equatable {
     required this.user,
     required this.formzStatus,
     required this.errorText,
-  
   });
 
   UsersState copyWith({

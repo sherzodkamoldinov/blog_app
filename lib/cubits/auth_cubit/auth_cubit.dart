@@ -121,6 +121,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+
   void clearUser() async {
     await StorageService.instance.storage.remove('token');
     emit(state.copyWith(

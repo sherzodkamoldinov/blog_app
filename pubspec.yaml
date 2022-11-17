@@ -26,14 +26,19 @@ dependencies:
   lottie: ^1.4.3
   fluttertoast: ^8.0.9
   modal_bottom_sheet: ^2.0.1
-  easy_localization: ^3.0.1
   connectivity_plus: ^2.3.7
-  # for bottom navigato bar
+
+  # for custom bottom navigato bar
   custom_navigation_bar: ^0.8.2
+
   # for screen responsibility
   flutter_screenutil: ^5.5.4
+
   # verification code
   pinput: ^2.2.14
+
+  # for language change
+  easy_localization: ^3.0.1
 
   # Local cache
   sqflite: ^2.0.3
@@ -48,6 +53,8 @@ dependencies:
   json_serializable: ^6.3.1
   flutter_linkify: ^5.0.2
   intl: ^0.17.0
+  cached_network_image: ^3.2.2
+  shimmer: ^2.0.0
 
 
 

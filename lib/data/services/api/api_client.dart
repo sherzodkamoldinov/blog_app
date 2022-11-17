@@ -55,7 +55,7 @@ class ApiClient {
         },
         onRequest: (requestOptions, handler) {
           debugPrint("============ DIO ON REQUEST ============");
-          requestOptions.headers["Accept"] = "application/json";
+          // requestOptions.headers["Accept"] = "application/json";
           return handler.next(requestOptions);
         },
         onResponse: (response, handler) async {

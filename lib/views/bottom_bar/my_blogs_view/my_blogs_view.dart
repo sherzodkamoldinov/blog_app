@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vlog_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:vlog_app/cubits/blogs_cubit/blogs_cubit.dart';
 import 'package:vlog_app/data/models/blog/blog_model.dart';
+import 'package:vlog_app/data/models/helper/action_model.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/constants.dart';
 import 'package:vlog_app/utils/icon.dart';
@@ -27,10 +28,14 @@ class _MyBlogsViewState extends State<MyBlogsView> {
       backgroundColor: MyColors.backgroundColor,
       appBar: CustomAppBarWithDrawer(
         title: "My Blogs",
-        actionIcon: Icons.add,
-        onPressed: () {
-          Navigator.pushNamed(context, addBlogView);
-        },
+        actions: [
+          ActionModel(
+            icon: Icons.add,
+            onPressed: () {
+              Navigator.pushNamed(context, addBlogView);
+            },
+          ),
+        ],
       ),
       drawer: const CustomDrawer(),
       body: SizedBox(
@@ -43,42 +48,41 @@ class _MyBlogsViewState extends State<MyBlogsView> {
             return myBlogs.isEmpty
                 ? const Center(
                     child: Text('Empty please add'),
-                  ) : state.formzStatus.isSubmissionInProgress ? MyUtils.showLoader(context)
+                  )
                 : state.formzStatus.isSubmissionInProgress
                     ? MyUtils.showLoader(context)
-                    : ListView.builder(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: myBlogs.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return InkWell(
-                            onTap: () {
-                              Navigator.pushNamed(context, readMoreView,
-                                  arguments: [
-                                    myBlogs[index].description,
-                                    myBlogs[index].title,
-                                    MyIcons.person,
-                                    "${currentUser.firstName} ${currentUser.lastName}"
-                                  ]);
-                            },
-                            child: blogItem(
-                                title: myBlogs[index].title,
-                                imageUrl: MyIcons.person,
-                                userName:
-                                    "${currentUser.firstName} ${currentUser.lastName}",
-                                text: myBlogs[index].description,
-                                onPressed: () {
+                    : state.formzStatus.isSubmissionInProgress
+                        ? MyUtils.showLoader(context)
+                        : ListView.builder(
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: myBlogs.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return InkWell(
+                                onTap: () {
                                   Navigator.pushNamed(context, readMoreView,
                                       arguments: [
                                         myBlogs[index].description,
                                         myBlogs[index].title,
                                         MyIcons.person,
-                                        "${currentUser.firstName} ${currentUser.lastName}",
+                                        "${currentUser.firstName} ${currentUser.lastName}"
                                       ]);
-                                }),
+                                },
+                                child: blogItem(
+                                    blog: myBlogs[index],
+                                    user: currentUser,
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, readMoreView,
+                                          arguments: [
+                                            myBlogs[index].description,
+                                            myBlogs[index].title,
+                                            MyIcons.person,
+                                            "${currentUser.firstName} ${currentUser.lastName}",
+                                          ]);
+                                    }),
+                              );
+                            },
                           );
-                        },
-                      );
           },
         ),
       ),

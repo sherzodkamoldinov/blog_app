@@ -2,7 +2,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vlog_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:vlog_app/cubits/blogs_cubit/blogs_cubit.dart';
+import 'package:vlog_app/cubits/type_cubit/type_cubit.dart';
 import 'package:vlog_app/cubits/users_cubit/users_cubit.dart';
+import 'package:vlog_app/data/repositories/type_repository.dart';
 import 'package:vlog_app/data/services/api/api_provider.dart';
 import 'package:vlog_app/data/repositories/auth_repository.dart';
 import 'package:vlog_app/data/repositories/blogs_repository.dart';
@@ -14,6 +16,7 @@ import 'package:vlog_app/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'data/services/api/api_client.dart';
 
@@ -22,11 +25,23 @@ void main() async {
   // await StorageRepository.getInstance();
   await ScreenUtil.ensureScreenSize();
   StorageService.init();
+  await EasyLocalization.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(App());
+  runApp(
+    EasyLocalization(
+      path: 'assets/translations',
+      supportedLocales: const [
+        Locale('en', 'EN'),
+        Locale('ru', 'RU'),
+        Locale('uz', 'UZ'),
+      ],
+      fallbackLocale: const Locale('en', 'EN'),
+      child: App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
@@ -49,6 +64,9 @@ class App extends StatelessWidget {
         RepositoryProvider<BlogsRepository>(
           create: (_) => BlogsRepository(apiProvider: _apiProvider),
         ),
+        RepositoryProvider<TypeRepository>(
+          create: (_) => TypeRepository(apiProvider: _apiProvider),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -65,6 +83,11 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => BlogsCubit(
               blogsRepository: context.read<BlogsRepository>(),
+            ),
+          ),
+           BlocProvider(
+            create: (context) => TypeCubit(
+              typeRepository: context.read<TypeRepository>(),
             ),
           ),
         ],
@@ -84,29 +107,31 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) => MaterialApp(
-          builder: (context, child) {
-            return StreamBuilder(
-                stream: Connectivity().onConnectivityChanged,
-                builder: (context, snapshot) {
-                  if (snapshot.data == ConnectivityResult.none) {
-                    return const NoInternetPage();
-                  }
-                  return MediaQuery(
-                    data: MediaQuery.of(context).copyWith(
-                        textScaleFactor: 1.0, alwaysUse24HourFormat: true),
-                    child: child!,
-                  );
-                });
-          },
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
+        builder: (context, child) {
+          return StreamBuilder(
+              stream: Connectivity().onConnectivityChanged,
+              builder: (context, snapshot) {
+                if (snapshot.data == ConnectivityResult.none) {
+                  return const NoInternetPage();
+                }
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                      textScaleFactor: 1.0, alwaysUse24HourFormat: true),
+                  child: child!,
+                );
+              });
+        },
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
             useMaterial3: true,
             primarySwatch: Colors.orange,
-            appBarTheme: const AppBarTheme(backgroundColor: Colors.orange)
-          ),
-          onGenerateRoute: MyRouter.generateRoute,
-          initialRoute: testView // mainPage,
-          ),
+            appBarTheme: const AppBarTheme(backgroundColor: Colors.orange)),
+        onGenerateRoute: MyRouter.generateRoute,
+        initialRoute: splashView,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+      ),
     );
   }
 }

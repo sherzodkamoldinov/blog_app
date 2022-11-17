@@ -13,11 +13,11 @@ class UsersRepository {
   Future<UserModel> getUserById({required int id}) =>
       _apiProvider.getUserById(id: id);
 
-  Future<UserModel> updateUserById({required UserModel user, XFile? file}) =>
+  Future<UserModel> updateCurrentUser({required UserModel user, XFile? file}) =>
       _apiProvider.updateCurrentUser(user: user, file: file);
 
-  Future<void> deleteUser() =>
-      _apiProvider.deleteUser();
+  Future<void> deleteCurrentUser() =>
+      _apiProvider.deleteCurrentUser();
 
   Future<UserModel> getCurrentUser() => _apiProvider.getCurrentUser();
 }

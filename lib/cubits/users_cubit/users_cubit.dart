@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:meta/meta.dart';
 import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:vlog_app/data/repositories/users_repository.dart';
@@ -32,12 +34,28 @@ class UsersCubit extends Cubit<UsersState> {
     emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
     try {
       UserModel user = await usersRepository.getCurrentUser();
-      emit(state.copyWith(
-          user: user, formzStatus: FormzStatus.submissionSuccess));
+      emit(
+        state.copyWith(user: user, formzStatus: FormzStatus.submissionSuccess),
+      );
+      debugPrint('CURRENT USER: ${user.toString()}');
     } catch (e) {
       emit(state.copyWith(
           errorText: e.toString(), formzStatus: FormzStatus.submissionFailure));
       rethrow;
+    }
+  }
+
+  Future<void> updateCurrentUser(
+      {required UserModel updateUser, XFile? file}) async {
+    emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
+    try {
+      UserModel updatedUser =
+          await usersRepository.updateCurrentUser(user: updateUser, file: file);
+      emit(state.copyWith(
+          formzStatus: FormzStatus.submissionSuccess, user: updatedUser));
+    } catch (e) {
+      emit(state.copyWith(
+          formzStatus: FormzStatus.submissionFailure, errorText: e.toString()));
     }
   }
 
@@ -66,14 +84,24 @@ class UsersCubit extends Cubit<UsersState> {
     }
   }
 
-  Future<void> deleteUser() async {
+  Future<void> deleteCurrentUser() async {
+    emit(state.copyWith(formzStatus: FormzStatus.submissionInProgress));
     try {
-      await usersRepository.deleteUser();
+      await usersRepository.deleteCurrentUser();
+      // TODO: ADD HERE DELETE ALL BLOGS OF USER
       await StorageService.instance.storage.remove('token');
+      emit(state.copyWith(formzStatus: FormzStatus.submissionSuccess));
       clearState();
     } catch (e) {
-      throw e;
+      emit(state.copyWith(
+          formzStatus: FormzStatus.submissionFailure, errorText: e.toString()));
+      rethrow;
     }
+  }
+
+  void logOut() async {
+    clearState();
+    await StorageService.instance.storage.remove('token');
   }
 
   void clearState() {

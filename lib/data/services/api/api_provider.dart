@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vlog_app/data/models/blog/blog_model.dart';
+import 'package:vlog_app/data/models/type/type_model.dart';
 import 'package:vlog_app/data/models/user/user_model.dart';
 import 'package:dio/dio.dart';
 import 'package:vlog_app/data/services/api/api_client.dart';
@@ -74,7 +75,6 @@ class ApiProvider {
 
       debugPrint('=== DIO VERIFY ===');
       debugPrint('${response.statusCode}');
-
     } on DioError catch (e) {
       debugPrint("*** DIO VERIFY ERROR ***\n ${e.response?.data}");
       if (e.response?.data is Map<String, dynamic>) {
@@ -171,8 +171,7 @@ class ApiProvider {
         options: Options(
           headers: {
             "Authorization":
-                'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNjY4NTI2NjY4LCJpc3MiOiJIYXZlIGEgbmljZSBkYXksIHRvZGF5IiwiYXVkIjoiQmxvZ0FwcCJ9.TfHUkbAIGswtzwNss5qWLXWCG-HeIwvYAsd8QW0a6Ik'
-            // 'Bearer ${StorageService.instance.storage.read('token')}'
+                'Bearer ${StorageService.instance.storage.read('token')}'
           },
         ),
       );
@@ -238,8 +237,8 @@ class ApiProvider {
         "image": file != null
             ? await MultipartFile.fromFile(file.path, filename: fileName)
             : '',
-        "firstName": user.firstName,
-        "lastName": user.lastName
+        "FirstName": user.firstName,
+        "LastName": user.lastName
         // TODO: qo'shmadim ustida o'ylab ko'rish kerak
         // "userName":'',
         // "email":'',
@@ -261,6 +260,7 @@ class ApiProvider {
 
       debugPrint('=== DIO UPDATE CURRENT USER ===');
       debugPrint('${response.statusCode}');
+      debugPrint('${response.data}');
 
       return UserModel.fromJson(response.data);
     } on DioError catch (e) {
@@ -274,15 +274,15 @@ class ApiProvider {
     }
   }
 
-  Future<void> deleteUser() async {
+  // TODO: Ishlamayabti
+  Future<void> deleteCurrentUser() async {
     try {
       Response response = await apiClient.dio.delete(
-        "${apiClient.dio.options.baseUrl}/api/users}",
+        "https://blogappuz.herokuapp.com/api/users",
         options: Options(
           headers: {
             "Authorization":
-                // 'Bearer ${StorageService.instance.storage.read('token')}'
-                'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjQwIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTY2ODUyOTg3OSwiaXNzIjoiSGF2ZSBhIG5pY2UgZGF5LCB0b2RheSIsImF1ZCI6IkJsb2dBcHAifQ.4aFDaYeR6KeYFdOXCBRKMf3ndm-e-QLMVI-rdyxP_WU'
+                'Bearer ${StorageService.instance.storage.read('token')}'
           },
         ),
       );
@@ -294,6 +294,11 @@ class ApiProvider {
       if (e.response != null) {
         if (e.response!.statusCode! >= 500) {
           throw ('Server Error');
+        } else if (e.response!.data is Map<String, dynamic>) {
+          if ((e.response!.data as Map<String, dynamic>)
+              .containsKey('message')) {
+            throw e.response!.data['message'];
+          }
         }
       }
       rethrow;
@@ -400,6 +405,38 @@ class ApiProvider {
       return true;
     } else {
       throw Exception();
+    }
+  }
+
+  // --------------------------- TYPES ------------------------
+  Future<List<TypeModel>> getTypes() async {
+    try {
+      Response response = await apiClient.dio.get(
+        '${apiClient.dio.options.baseUrl}/api/Type',
+        options: Options(
+          headers: {
+            "Authorization":
+                'Bearer ${StorageService.instance.storage.read('token')}',
+          },
+        ),
+      );
+
+      debugPrint('=== DIO GET TYPES ===');
+      debugPrint('${response.statusCode}');
+      debugPrint('${response.data}');
+
+      return (response.data as List?)
+              ?.map((e) => TypeModel.fromJson(e))
+              .toList() ??
+          [];
+    } on DioError catch (e) {
+      debugPrint("*** DIO GET TYPES ERROR ***\nmessage: ${e.response?.statusMessage}\ndata: ${e.response?.data}");
+      if (e.response != null) {
+        if (e.response!.statusCode! >= 500) {
+          throw ('Server Error');
+        }
+      }
+      throw 'error';
     }
   }
 }

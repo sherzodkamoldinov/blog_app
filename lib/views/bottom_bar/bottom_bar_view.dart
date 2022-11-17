@@ -3,10 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vlog_app/cubits/auth_cubit/auth_cubit.dart';
+import 'package:vlog_app/cubits/type_cubit/type_cubit.dart';
 import 'package:vlog_app/cubits/users_cubit/users_cubit.dart';
-import 'package:vlog_app/data/models/user/user_model.dart';
-import 'package:vlog_app/data/services/local/storage_service.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/views/bottom_bar/favorites/favorite_view.dart';
 import 'package:vlog_app/views/bottom_bar/main_view/main_view.dart';
@@ -33,23 +31,30 @@ class _BottomBarViewState extends State<BottomBarView> {
   @override
   void initState() {
     super.initState();
-    // _init();
+    _init();
   }
 
-  // _init() async {
-  //   UserModel user =
-  //       await BlocProvider.of<UsersCubit>(context).getCurrentUser();
-  //       await BlocProvider.of<UsersCubit>(context).getAllUser();
-  //   BlocProvider.of<AuthCubit>(context).changeUser(user: user);
-  //   debugPrint(user.toString());
-  // }
+  _init() async {
+    // TODO: GET CURRENT USER
+    await BlocProvider.of<UsersCubit>(context).getCurrentUser();
+
+    // TODO: GET ALL USERS
+    await BlocProvider.of<UsersCubit>(context).getAllUser();
+
+    // TODO: GET ALL TYPES
+    await BlocProvider.of<TypeCubit>(context).getTypes();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
       backgroundColor: MyColors.backgroundColor,
-      body: screens[_current_screen],
+      body: RefreshIndicator(
+          onRefresh: () {
+            return _init();
+          },
+          child: screens[_current_screen]),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.only(bottom: 15.h),
         child: CustomNavigationBar(

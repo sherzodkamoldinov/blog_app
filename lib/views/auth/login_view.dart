@@ -1,7 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:formz/formz.dart';
@@ -12,7 +11,6 @@ import 'package:vlog_app/utils/constants.dart';
 import 'package:vlog_app/utils/icon.dart';
 import 'package:vlog_app/utils/my_utils.dart';
 import 'package:vlog_app/utils/style.dart';
-import 'package:vlog_app/views/widgest/custom_appbar.dart';
 import 'package:vlog_app/views/widgest/custom_botton.dart';
 import 'package:vlog_app/views/widgest/custom_text_field.dart';
 
@@ -63,7 +61,7 @@ class _LoginViewState extends State<LoginView> {
           elevation: 0,
           centerTitle: true,
           title: Text(
-            "Login",
+            tr('login'),
             style: MyTextStyle.sfProSemibold
                 .copyWith(fontSize: 20, color: MyColors.richBlack),
           ),
@@ -100,7 +98,7 @@ class _LoginViewState extends State<LoginView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // EMAIL FIELD
-                    Text("  Email",
+                    Text(tr('email'),
                         style:
                             MyTextStyle.sfProRegular.copyWith(fontSize: 20.sp)),
                     SizedBox(height: 5.h),
@@ -108,14 +106,14 @@ class _LoginViewState extends State<LoginView> {
                       type: "email",
                       controller: _emailController,
                       isPassword: false,
-                      text: "Enter your email",
+                      text: tr('enter_your_email'),
                       focusNode: _emailFocusNode,
                       nextFocusNode: _passwordFocusNode,
                     ),
 
                     // PASSWORD FIELD
                     SizedBox(height: 20.h),
-                    Text("  Password",
+                    Text(tr('password'),
                         style:
                             MyTextStyle.sfProRegular.copyWith(fontSize: 20.sp)),
                     SizedBox(height: 5.h),
@@ -124,7 +122,7 @@ class _LoginViewState extends State<LoginView> {
                       isEnd: true,
                       controller: _passwordController,
                       isPassword: true,
-                      text: "Password",
+                      text: tr('enter_your_password'),
                       focusNode: _passwordFocusNode,
                       nextFocusNode: _passwordFocusNode,
                     ),
@@ -144,11 +142,11 @@ class _LoginViewState extends State<LoginView> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: "Forgot ",
+                          text: tr('forgot_password_1'),
                           style: MyTextStyle.sfProRegular,
                         ),
                         TextSpan(
-                          text: "Password?",
+                          text: tr('forgot_password_2'),
                           style: MyTextStyle.sfProSemibold,
                         ),
                       ],
@@ -171,12 +169,12 @@ class _LoginViewState extends State<LoginView> {
 
                         Navigator.pushNamed(context, homeView);
                       } else {
-                        MyUtils.showSnackBar(context, "Please fill currently");
+                        MyUtils.showSnackBar(context, tr('please_fill_right'));
                       }
                     },
                     title: state.formzStatus.isSubmissionInProgress
                         ? null
-                        : 'Sign In',
+                        : tr('sign_in'),
                     fillColor: true,
                   );
                 },
@@ -194,11 +192,11 @@ class _LoginViewState extends State<LoginView> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: "Don't have an account? ",
+                          text: tr('register_now_1'),
                           style: MyTextStyle.sfProRegular,
                         ),
                         TextSpan(
-                          text: "Register Now ",
+                          text: tr('register_now_2'),
                           style: MyTextStyle.sfProSemibold,
                         ),
                       ],

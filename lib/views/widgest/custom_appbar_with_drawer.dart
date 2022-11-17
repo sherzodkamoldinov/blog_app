@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vlog_app/data/models/helper/action_model.dart';
 import 'package:vlog_app/utils/color.dart';
 import 'package:vlog_app/utils/icon.dart';
 import 'package:vlog_app/utils/style.dart';
 
 class CustomAppBarWithDrawer extends StatelessWidget implements PreferredSize {
-  const CustomAppBarWithDrawer(
-      {super.key, this.title, this.actionIcon, this.onPressed});
+  const CustomAppBarWithDrawer({
+    super.key,
+    this.title,
+    this.actions,
+  });
   final String? title;
-  final IconData? actionIcon;
-  final VoidCallback? onPressed;
+  final List<ActionModel>? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +21,10 @@ class CustomAppBarWithDrawer extends StatelessWidget implements PreferredSize {
       backgroundColor: MyColors.backgroundColor,
       elevation: 0,
       centerTitle: true,
-      title:
-          title != null ? Text(title!, style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp)) : null,
+      title: title != null
+          ? Text(title!,
+              style: MyTextStyle.sfProRegular.copyWith(fontSize: 24.sp))
+          : null,
       systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: MyColors.black,
         statusBarIconBrightness: Brightness.light,
@@ -37,14 +42,18 @@ class CustomAppBarWithDrawer extends StatelessWidget implements PreferredSize {
           ),
         );
       }),
-      actions: actionIcon != null
+      actions: actions != null
           ? [
-              IconButton(
-                  onPressed: onPressed ?? (){},
+              ...List.generate(
+                actions!.length,
+                (index) => IconButton(
+                  onPressed: actions![index].onPressed,
                   icon: Icon(
-                    actionIcon,
+                    actions![index].icon,
                     color: MyColors.richBlack,
-                  ))
+                  ),
+                ),
+              ),
             ]
           : null,
     );

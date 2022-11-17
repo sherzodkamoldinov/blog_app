@@ -34,7 +34,7 @@ class _TestViewState extends State<TestView> {
     var token = StorageService.instance.storage.read("token");
     if (token == null) {
       await StorageService.instance.storage.write('token',
-          'eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjQwIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTY2ODUyOTg3OSwiaXNzIjoiSGF2ZSBhIG5pY2UgZGF5LCB0b2RheSIsImF1ZCI6IkJsb2dBcHAifQ.4aFDaYeR6KeYFdOXCBRKMf3ndm-e-QLMVI-rdyxP_WU');
+          'eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjQxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTY2ODU5NDk5NywiaXNzIjoiSGF2ZSBhIG5pY2UgZGF5LCB0b2RheSIsImF1ZCI6IkJsb2dBcHAifQ.FAlm1-mISWVuYU8_H915mSdwMrtggzgCVkhfAPldiy4');
     }
   }
 
@@ -45,37 +45,38 @@ class _TestViewState extends State<TestView> {
       backgroundColor: MyColors.richBlack,
       appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                _getFromGallery();
-              },
-              child: const Text('select image'),
-            ),
-            SizedBox(
-              child: myImage.isNotEmpty
-                  ? Image.network(myImage)
-                  : Image.asset(MyIcons.imageSample),
-            ),
-            TextField(
-              controller: nameCon,
-              decoration: MyUtils.getInputDecoration(label: 'name'),
-            ),
-            TextField(
-              controller: surnameCon,
-              decoration: MyUtils.getInputDecoration(label: 'surname'),
-            ),
-            const Center(
-              child: Text("DATA:"),
-            ),
-            Text(data),
-          ],
-        ),
+        //   child: Column(
+        //     children: [
+        //       ElevatedButton(
+        //         onPressed: () {
+        //           _getFromGallery();
+        //         },
+        //         child: const Text('select image'),
+        //       ),
+        //       SizedBox(
+        //         child: myImage.isNotEmpty
+        //             ? Image.network(myImage)
+        //             : Image.asset(MyIcons.imageSample),
+        //       ),
+        //       TextField(
+        //         controller: nameCon,
+        //         decoration: MyUtils.getInputDecoration(label: 'name'),
+        //       ),
+        //       TextField(
+        //         controller: surnameCon,
+        //         decoration: MyUtils.getInputDecoration(label: 'surname'),
+        //       ),
+        //       const Center(
+        //         child: Text("DATA:"),
+        //       ),
+        //       Text(data),
+        //     ],
+        //   ),
+        child: Container(),
       ),
       floatingActionButton: FloatingActionButton(onPressed: () async {
         try {
-              await ApiProvider(apiClient: ApiClient()).deleteUser();
+          // await ApiProvider(apiClient: ApiClient()).deleteUser();
         } catch (e) {
           print('ERROR ON PAGE: $e}');
           MyUtils.showSnackBar(context, e.toString());
@@ -84,7 +85,7 @@ class _TestViewState extends State<TestView> {
     );
   }
 
-  _getFromGallery() async {
+  _getFromGallery({required XFile image}) async {
     XFile? pickedFile = await _picker.pickImage(
       maxWidth: 500,
       maxHeight: 500,
@@ -92,7 +93,7 @@ class _TestViewState extends State<TestView> {
     );
     if (pickedFile != null) {
       setState(() {
-        _image = pickedFile;
+        image = pickedFile;
       });
     }
   }
